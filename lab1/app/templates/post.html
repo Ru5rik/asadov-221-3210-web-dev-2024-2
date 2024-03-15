@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div>
+    <h1> {{ post['title'] }} </h1>
+    {{ post.author }}, {{ post.date.strftime('%d.%m.%Y') }}
+    <img src="{{ url_for('static', filename='images/' + post.image_filename) }}" alt="" class="img-fluid py-3">
+    <p> {{ post.text }} </p>
+</div>
+<div class="card">
+    <div class="card-header">
+        <h4 class="my-0 fw-normal">Оставьте коментарий</p>
+    </div>
+    <div class="card-body">
+        <textarea name="comment" id="" cols="30" rows="5" class="form-control"></textarea>
+        <a href="#" class="btn btn-primary mt-3">Отправить</a>
+    </div>
+</div>
+<div class="row">
+    {% for comment in post.comments %}
+    <div class="col-12 py-3">
+        <h5> {{ comment.author }} </h5>
+        <p> {{ comment.text }} </p>
+        <div class="row justify-content-end">
+            {% for repl in comment.replies %}
+            <div class="col-11">
+                <h5> {{ repl.author }} </h5>
+                <p> {{ repl.text }} </p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock content %}

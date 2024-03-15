@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css')}}">
+{% endblock %}
+
+{% block content %}
+<h1 class="text-center">{{ msg }}</h1>
+
+<div class="row">
+    <div class="col-4">
+        <img src="{{ url_for('static', filename='images/avatar.jpg')}}" alt="" class="img-fluid">
+    </div>
+    <div class="col-8">
+        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Non modi, a doloribus eaque ex nemo ducimus unde
+        eligendi aspernatur facere ipsa accusamus error iusto sunt autem perferendis natus magni vero.
+    </div>
+</div>
+{% endblock content %}

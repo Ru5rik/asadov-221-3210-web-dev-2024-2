@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<div>
+    <h1 class="mb-3">Проверка правильности номера телефона</h1>
+    <form class="" method="post">
+        <div class="row">
+            <label class="col-form-label col-auto" for="tel">Номер</label>
+            <div class="col-4 mb-3">
+                <input class="form-control {% if error != '' %}is-invalid{% endif %}" type="text" name="tel" id="tel"
+                    value="{{ request.form['tel'] }}" aria-describedby="validationServer02Feedback" required>
+                <div class="invalid-feedback" id="validationServer02Feedback">
+                    Недопустимый ввод. {{ error }}
+                </div>
+            </div>
+            <div class="col-auto">
+                <input class="btn btn-secondary" type="submit" value="Проверить">
+            </div>
+        </div>
+    </form>
+    <div>
+        <h1>{{ result }}</h1>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+<div>
+    <h1 class="mb-3">Форма</h1>
+    <form method="post" class="form border p-3 rounded mb-3">
+        <div class="row">
+            <label class="col-form-label col-1" for="login">Логин</label>
+            <div class="col-5 mb-3">
+                <input class="form-control" type="text" name="login" id="login" value="{{ request.form['login'] }}">
+            </div>
+            <label class="col-form-label col-1" for="pass">Пароль</label>
+            <div class="col-5 mb-3">
+                <input class="form-control" type="password" name="pass" id="pass" value="{{ request.form['pass'] }}">
+            </div>
+            <label class="col-form-label col-1" for="number">Число</label>
+            <div class="col-5 mb-3">
+                <input class="form-control" type="number" name="number" id="number"
+                    value="{{ request.form['number'] }}">
+            </div>
+            <label class="col-form-label col-1" for="date">Дата</label>
+            <div class="col-5 mb-3">
+                <input class="form-control" type="date" name="date" id="date" value="{{ request.form['date'] }}">
+            </div>
+            <div>
+                <input class="btn btn-secondary" type="submit" value="Отправить">
+            </div>
+        </div>
+    </form>
+</div>
+<div>
+    <h1 class="mb-3">Параметры Формы</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr class="table-dark">
+                <th>Ключ</th>
+                <th>Параметр</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for key, value in request.form.items() %}
+            <tr>
+                <td>{{ key }} </td>
+                <td>{{ value }} </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

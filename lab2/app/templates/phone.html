@@ -17,8 +17,8 @@
             </div>
         </div>
     </form>
-    <div>
-        <h1>{{ result }}</h1>
+    <div class="alert alert-{% if error == '' %}success{% else %}danger{% endif %}">
+        <h2>Результат проверки: {{ result }}</h2>
     </div>
 </div>
 {% endblock %}

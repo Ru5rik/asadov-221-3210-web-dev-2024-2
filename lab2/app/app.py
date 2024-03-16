@@ -38,24 +38,16 @@ def phone():
     error = ''
     if request.method == 'POST':
         tel = request.form.get('tel')
-        # full
-        # "^(\+7|8)[\s+()-.]*(\d{3})[\s+()-.]*(\d{3})[\s+()-.]*(\d\d)[\s+()-.]*(\d\d)"gm
-        
-        # nums
-        # ^(\+7|8)([\D]*)([\d]*)([\D]*)([\d]*)([\D]*)([\d]*)([\D]*)([\d]*)
-        
-        # gibrid
-        # ^(\+7|8)([\D]*)(\d{,3})([\D]*)(\d{,3})([\D]*)(\d{,2})([\D]*)(\d{,2})
-        
         match = re.search(r'^(?P<start>\+7|8*)(?P<other>.+)', tel)
         nums = ''.join(re.findall(r'\d', match.group('other')))
         chars = set(re.findall(r'\D', match.group('other')))
+        result = f'8-{nums[:3]}-{nums[4:6]}-{nums[6:8]}-{nums[8:10]}'
 
         if len(nums) != 10:
             error = 'Неверное количество цифр.'
+            result = 'ошибка'
         if not chars < set('() +.-'):
             error = 'В номере телефона встречаются недопустимые символы.'
-            
-        result = f'8-{nums[:3]}-{nums[4:6]}-{nums[6:8]}-{nums[8:10]}'
-        
+            result = 'ошибка'
+
     return render_template('phone.html', error=error, result=result)

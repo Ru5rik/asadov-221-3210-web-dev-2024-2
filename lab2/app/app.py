@@ -36,6 +36,7 @@ def form():
 @app.route('/phone', methods=['POST', 'GET'])
 def phone():
     error = ''
+    result = ''
     if request.method == 'POST':
         tel = request.form.get('tel')
         match = re.search(r'^(?P<start>\+7|8*)(?P<other>.+)', tel)
@@ -50,4 +51,5 @@ def phone():
             error = 'В номере телефона встречаются недопустимые символы.'
             result = 'ошибка'
 
+        
     return render_template('phone.html', error=error, result=result)

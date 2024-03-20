@@ -39,7 +39,7 @@ def phone():
     result = ''
     if request.method == 'POST':
         tel = request.form.get('tel')
-        match = re.search(r'^(?P<start>\+7|8*)(?P<other>.+)', tel)
+        match = re.search(r'^(?P<start>\+7|8?)(?P<other>.+)', tel)
         nums = ''.join(re.findall(r'\d', match.group('other')))
         chars = set(re.findall(r'\D', match.group('other')))
         result = f'8-{nums[:3]}-{nums[4:6]}-{nums[6:8]}-{nums[8:10]}'

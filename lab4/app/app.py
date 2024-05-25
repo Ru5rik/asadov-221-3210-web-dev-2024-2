@@ -1,6 +1,6 @@
 import re
 from flask import Flask, render_template, make_response, url_for, redirect, request, session, flash
-from flask_login import LoginManager, UserMixin, logout_user, login_user, login_required
+from flask_login import LoginManager, UserMixin, logout_user, login_user, login_required, current_user
 from mysqldb import DBConnector
 from mysql.connector.errors import DatabaseError
 
@@ -27,7 +27,7 @@ class User(UserMixin):
 CREATE_USER_FIELDS = ['login', 'password', 'last_name',
                       'first_name', 'middle_name', 'role_id']
 EDIT_USER_FIELDS = ['last_name', 'first_name', 'middle_name', 'role_id']
-
+EDIT_PASS_FIELDS = ['password', 'spassword']
 
 def get_user(id):
     query = ("SELECT Users.ID as id, Users.Login as login, Users.LastName as last_name, "
@@ -78,6 +78,8 @@ def get_form_data(required_fields):
 def validate_form(user, fields):
     regex = {'login': r'^[\da-zA-Z]{5,}$',
              'password': r'^(?=.*\d)(?=.*[A-ZА-Я])(?=.*[a-zа-я])(?=.*[\~\!\?\@\#\$\%\^'\
+             r'\&\*\_\-\+\(\)\[\]\{\}\>\<\/\\\|\"\'\.\,\:\;]*)([^\s]){8,128}$',
+             'spassword': r'^(?=.*\d)(?=.*[A-ZА-Я])(?=.*[a-zа-я])(?=.*[\~\!\?\@\#\$\%\^'\
              r'\&\*\_\-\+\(\)\[\]\{\}\>\<\/\\\|\"\'\.\,\:\;]*)([^\s]){8,128}$',
              'last_name': r'^[a-zA-Zа-яА-Я]+$',
              'first_name': r'^[a-zA-Zа-яА-Я]+$'}
@@ -135,7 +137,7 @@ def edit_user(user_id):
         user = get_form_data(EDIT_USER_FIELDS)
         errors, is_error = validate_form(user, EDIT_USER_FIELDS[:2])
         if is_error:
-            flash(f'Ошибка создания пользователя!', category="danger")
+            flash(f'Ошибка изменения пользователя!', category="danger")
             return render_template("edit_user.html", user=user, roles=roles, errors=errors)
 
         user['user_id'] = user_id
@@ -156,6 +158,39 @@ def edit_user(user_id):
                 f'Ошибка редактирования пользователя! {error}', category="danger")
             db_connector.connect().rollback()
     return render_template("edit_user.html", user=user, roles=roles, errors=errors)
+
+@app.route('/editpass', methods=['GET', 'POST'])
+@login_required
+def edit_pass_user():
+    user = get_user(current_user.id)
+    errors = {}
+    if request.method == "POST":
+        user = get_form_data(EDIT_PASS_FIELDS)
+        errors, is_error = validate_form(user, EDIT_PASS_FIELDS)
+
+        if is_error:
+            flash(f'Ошибка изменения пользователя!', category="danger")
+            return render_template("edit_pass_user.html", user=user, errors=errors)
+
+        if user['password'] != user['spassword']:
+            flash(f'Пароли должны совпадать!', category="danger")
+            return render_template("edit_pass_user.html", user=user, errors=errors)
+
+        user['user_id'] = current_user.id
+        query = "UPDATE Users SET PassHash=SHA2(%(password)s, 256) WHERE ID=%(user_id)s"
+
+        try:
+            with db_connector.connect().cursor(named_tuple=True) as cursor:
+                cursor.execute(query, user)
+                db_connector.connect().commit()
+
+            flash("Запись пользователя успешно обновлена", category="success")
+            return redirect(url_for('index'))
+        except DatabaseError as error:
+            flash(
+                f'Ошибка редактирования пользователя! {error}', category="danger")
+            db_connector.connect().rollback()
+    return render_template("edit_pass_user.html", user=user, errors=errors)
 
 
 @app.route('/<int:user_id>/delete', methods=["POST"])

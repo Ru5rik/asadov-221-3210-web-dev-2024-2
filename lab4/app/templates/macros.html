@@ -9,6 +9,8 @@
             Недопустимое значние. Поле принимает только буквы и цифры!
         </div>
     </div>
+    {% endif %}
+    {% if action=='create' or action=='edit_pass' %}
     <div class="mb-3">
         <label class="form-label" for="password">Пароль</label>
         <input class="form-control {% if errors['password'] %}is-invalid{% endif %}" type="password" id="password" name="password" aria-describedby="valFeedback2">
@@ -17,6 +19,17 @@
         </div>
     </div>
     {% endif %}
+    {% if action=='edit_pass' %}
+    <div class="mb-3">
+        <label class="form-label" for="spassword">Повторите пароль</label>
+        <input class="form-control {% if errors['spassword'] %}is-invalid{% endif %}" type="password" id="spassword" name="spassword" aria-describedby="valFeedback20">
+        <div class="invalid-feedback" id="valFeedback20">
+            Недопустимое значние. Пароль должен состоять из 1 прописной буквы, 1 Заглавной, 1 цифры, а также может содержать спец символы!
+        </div>
+    </div>
+    {% endif %}
+    {% if action!='edit_pass' %}
+
     <div class="mb-3">
         <label class="form-label" for="last_name">Фамилия</label>
         <input class="form-control {% if errors['last_name'] %}is-invalid{% endif %}" type="text" id="last_name" name="last_name" value="{{ user.last_name or '' }}"
@@ -48,6 +61,8 @@
             {% endfor %}
         </select>
     </div>
+    {% endif %}
+
     <button class="btn btn-primary">Сохранить</button>
 </form>
 {% endmacro %}

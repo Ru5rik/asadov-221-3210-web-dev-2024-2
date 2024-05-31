@@ -10,6 +10,15 @@
         </div>
     </div>
     {% endif %}
+    {% if action=='edit_pass' %}
+    <div class="mb-3">
+        <label class="form-label" for="oldpassword">Старый пароль</label>
+        <input class="form-control {% if errors['oldpassword'] %}is-invalid{% endif %}" type="password" id="oldpassword" name="oldpassword" aria-describedby="valFeedback21">
+        <div class="invalid-feedback" id="valFeedback21">
+            Неверный пароль!
+        </div>
+    </div>
+    {% endif %}
     {% if action=='create' or action=='edit_pass' %}
     <div class="mb-3">
         <label class="form-label" for="password">Пароль</label>

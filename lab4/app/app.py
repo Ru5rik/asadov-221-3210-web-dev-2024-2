@@ -27,7 +27,7 @@ class User(UserMixin):
 CREATE_USER_FIELDS = ['login', 'password', 'last_name',
                       'first_name', 'middle_name', 'role_id']
 EDIT_USER_FIELDS = ['last_name', 'first_name', 'middle_name', 'role_id']
-EDIT_PASS_FIELDS = ['password', 'spassword']
+EDIT_PASS_FIELDS = ['oldpassword','password', 'spassword']
 
 def get_user(id):
     query = ("SELECT Users.ID as id, Users.Login as login, Users.LastName as last_name, "
@@ -162,26 +162,33 @@ def edit_user(user_id):
 @app.route('/editpass', methods=['GET', 'POST'])
 @login_required
 def edit_pass_user():
-    user = get_user(current_user.id)
     errors = {}
     if request.method == "POST":
-        user = get_form_data(EDIT_PASS_FIELDS)
-        errors, is_error = validate_form(user, EDIT_PASS_FIELDS)
+        form_data = get_form_data(EDIT_PASS_FIELDS)
+        errors, is_error = validate_form(form_data, EDIT_PASS_FIELDS[1:])
+        form_data['user_id'] = current_user.id
 
-        if is_error:
-            flash(f'Ошибка изменения пользователя!', category="danger")
-            return render_template("edit_pass_user.html", user=user, errors=errors)
-
-        if user['password'] != user['spassword']:
-            flash(f'Пароли должны совпадать!', category="danger")
-            return render_template("edit_pass_user.html", user=user, errors=errors)
-
-        user['user_id'] = current_user.id
-        query = "UPDATE Users SET PassHash=SHA2(%(password)s, 256) WHERE ID=%(user_id)s"
-
+        query = ("SELECT ID as id FROM Users WHERE ID=%(user_id)s AND PassHash = SHA2(%(oldpassword)s, 256)")
+        
         try:
             with db_connector.connect().cursor(named_tuple=True) as cursor:
-                cursor.execute(query, user)
+                cursor.execute(query, form_data)
+                if cursor.fetchone() is None:
+                    errors['oldpassword'] = True
+                    is_error = True
+
+            if is_error:
+                flash(f'Ошибка изменения пароля!', category="danger")
+                return render_template("edit_pass_user.html", errors=errors)
+
+            if form_data['password'] != form_data['spassword']:
+                flash(f'Пароли должны совпадать!', category="danger")
+                return render_template("edit_pass_user.html", errors=errors)
+
+            query = "UPDATE Users SET PassHash=SHA2(%(password)s, 256) WHERE ID=%(user_id)s"
+
+            with db_connector.connect().cursor(named_tuple=True) as cursor:
+                cursor.execute(query, form_data)
                 db_connector.connect().commit()
 
             flash("Запись пользователя успешно обновлена", category="success")
@@ -190,7 +197,7 @@ def edit_pass_user():
             flash(
                 f'Ошибка редактирования пользователя! {error}', category="danger")
             db_connector.connect().rollback()
-    return render_template("edit_pass_user.html", user=user, errors=errors)
+    return render_template("edit_pass_user.html", errors=errors)
 
 
 @app.route('/<int:user_id>/delete', methods=["POST"])

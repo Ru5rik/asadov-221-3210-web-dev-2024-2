@@ -1,0 +1,33 @@
+{% extends 'logs_base.html' %}
+
+{% block tab_content %}
+<h2>Статистика посещений по пользователям</h2>
+<table class="table">
+    <thead>
+        <th>№</th>
+        <th>Пользователь</th>
+        <th>Количество посещений</th>
+    </thead>
+    <tbody>
+        {% for log in logs %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ log.login or "Неавторизованные пользователи" }}</td>
+            <td>{{ log.visit_count }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        <li class="page-item {% if page_number == 1 %} disabled {% endif %}"><a class="page-link" href="{{ url_for('logs.index', page_number = page_number - 1) }}">Предыдущая</a></li>
+        {% for page in range(start_page, end_page + 1) %}
+        <li class="page-item {% if page == page_number %} active {% endif %}"><a class="page-link"
+                href="{{ url_for('logs.users_stat', page_number = page) }}">{{ page }}</a></li>
+
+        {% endfor %}
+        <li class="page-item {% if page_number == end_page %} disabled {% endif %}"><a class="page-link" href="{{ url_for('logs.index', page_number = page_number + 1) }}">Следующая</a></li>
+    </ul>
+</nav>
+<a class="btn btn-primary" href="{{ url_for('logs.users_stat', download=True) }}">Экспортировать в CSV</a>
+{% endblock %}

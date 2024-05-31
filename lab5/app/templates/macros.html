@@ -1,0 +1,78 @@
+{% macro user_form(is_admin, roles, action='create', user=None, errors=None) %}
+<form method="post">
+    {% if action=='create' %}
+    <div class="mb-3">
+        <label class="form-label" for="login">Логин</label>
+        <input class="form-control {% if errors['login'] %}is-invalid{% endif %}" type="text" id="login" name="login" value="{{ user.login or '' }}"
+            aria-describedby="valFeedback1">
+        <div class="invalid-feedback" id="valFeedback1">
+            Недопустимое значние. Поле принимает только буквы и цифры!
+        </div>
+    </div>
+    {% endif %}
+    {% if action=='edit_pass' %}
+    <div class="mb-3">
+        <label class="form-label" for="oldpassword">Старый пароль</label>
+        <input class="form-control {% if errors['oldpassword'] %}is-invalid{% endif %}" type="password" id="oldpassword" name="oldpassword" aria-describedby="valFeedback21">
+        <div class="invalid-feedback" id="valFeedback21">
+            Неверный пароль!
+        </div>
+    </div>
+    {% endif %}
+    {% if action=='create' or action=='edit_pass' %}
+    <div class="mb-3">
+        <label class="form-label" for="password">Пароль</label>
+        <input class="form-control {% if errors['password'] %}is-invalid{% endif %}" type="password" id="password" name="password" aria-describedby="valFeedback2">
+        <div class="invalid-feedback" id="valFeedback2">
+            Недопустимое значние. Пароль должен состоять из 1 прописной буквы, 1 Заглавной, 1 цифры, а также может содержать спец символы!
+        </div>
+    </div>
+    {% endif %}
+    {% if action=='edit_pass' %}
+    <div class="mb-3">
+        <label class="form-label" for="spassword">Повторите пароль</label>
+        <input class="form-control {% if errors['spassword'] %}is-invalid{% endif %}" type="password" id="spassword" name="spassword" aria-describedby="valFeedback20">
+        <div class="invalid-feedback" id="valFeedback20">
+            Недопустимое значние. Пароль должен состоять из 1 прописной буквы, 1 Заглавной, 1 цифры, а также может содержать спец символы!
+        </div>
+    </div>
+    {% endif %}
+    {% if action!='edit_pass' %}
+
+    <div class="mb-3">
+        <label class="form-label" for="last_name">Фамилия</label>
+        <input class="form-control {% if errors['last_name'] %}is-invalid{% endif %}" type="text" id="last_name" name="last_name" value="{{ user.last_name or '' }}"
+            aria-describedby="valFeedback3">
+        <div class="invalid-feedback" id="valFeedback3">
+            Недопустимая фамилия. Можно использовать только буквы!
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="first_name">Имя</label>
+        <input class="form-control {% if errors['first_name'] %}is-invalid{% endif %}" type="text" id="first_name" name="first_name" value="{{ user.first_name or '' }}"
+            aria-describedby="valFeedback4">
+        <div class="invalid-feedback" id="valFeedback4">
+            Недопустимое имя. Можно использовать только буквы!
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="middle_name">Отчество</label>
+        <input class="form-control" type="text" id="middle_name" name="middle_name"
+            value="{{ user.middle_name or '' }}">
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="role">Роль</label>
+        <select class="form-select" id="role" name="role_id"
+        {% if not is_admin %} disabled {% endif %}>
+            {% for role in roles %}
+            <option value="{{ role.id }}" {% if user.role_id|string==role.id|string %}selected{% endif %}>{{ role.name
+                }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    {% endif %}
+
+    <button class="btn btn-primary">Сохранить</button>
+</form>
+{% endmacro %}

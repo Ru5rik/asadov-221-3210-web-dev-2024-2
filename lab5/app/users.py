@@ -150,7 +150,7 @@ def create():
             flash(f'Ошибка создания пользователя! {error}', category="danger")
             db_connector.connect().rollback()
 
-    return render_template("user_form.html", user=user, roles=roles, errors=errors)
+    return render_template("user_form.html", user=user, roles=roles, errors=errors, is_admin=current_user.is_admin())
 
 @bp.route('/editpass', methods=['GET', 'POST'])
 @login_required

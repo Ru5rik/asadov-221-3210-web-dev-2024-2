@@ -3,7 +3,7 @@ import uuid
 import os
 from werkzeug.utils import secure_filename
 from flask import current_app
-from models import db, Course, Image
+from models import db, Course, Image, Review
 
 class CoursesFilter:
     def __init__(self, name, category_ids):
@@ -51,3 +51,21 @@ class ImageSaver:
         self.md5_hash = hashlib.md5(self.file.read()).hexdigest()
         self.file.seek(0)
         return db.session.execute(db.select(Image).filter(Image.md5_hash == self.md5_hash)).scalar()
+
+class ReviewFilter:
+    def __init__(self, review_types, course_id):
+        self.review_types = review_types
+        self.query = db.select(Review).where(Review.course_id == course_id)
+
+    def perform(self):
+        self.__filter_by_review_types()
+        return self.query.order_by(Review.created_at.desc())
+
+
+    def __filter_by_review_types(self):
+        print('111111111111111111', self.review_types)
+        # t = self.review_types[0]
+        # if t is 'good':
+        #     self.query = self.query.order_by(Review.raiting.desc())
+        # if t is 'bad':
+        #     self.query = self.query.order_by(Review.raiting.asc())

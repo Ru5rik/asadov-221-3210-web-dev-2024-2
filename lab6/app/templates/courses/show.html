@@ -66,6 +66,7 @@
 </div>
 
 <div class="container mt-5">
+    {% if can %}
     <section class="review mb-5">
         <h2 class="mb-3 text-center text-uppercase font-weight-bold">Оставить отзыв</h2>
         <form method="POST" action="{{ url_for('courses.comment', course_id=course.id) }}">
@@ -91,21 +92,21 @@
             </div>
         </form>
     </section>
-
+    {% endif %}
     <section class="reviews mb-5">
         <h2 class="mb-3 text-center text-uppercase font-weight-bold">Последние отзывы</h2>
         {% for review in reviews %}
         <div class="card mb-3">
             <div class="card-header">
                 <h5 class="card-title">Оценка: {{ review.raiting }} | {{ review.user.first_name }} {{
-                    review.user.last_name }}</h5>
+                    review.user.last_name }} | {{ review.created_at }} </h5>
             </div>
             <div class="card-body">
                 <p class="card-text">{{ review.text }}</p>
             </div>
         </div>
         {% endfor %}
-
+        <a class="btn btn-dark" href="{{ url_for('courses.reviews', course_id=course.id) }}">Все отзывы</a>
     </section>
 </div>
 

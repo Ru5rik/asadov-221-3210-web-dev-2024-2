@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% from 'pagination.html' import render_pagination %}
+
+{% block content %}
+<div class="container">
+    <div class="my-5">
+
+        <h2 class="mb-3 text-center text-uppercase font-weight-bold">Каталог курсов</h2>
+
+        <form class="mb-5 mt-3 row align-items-center">
+            <div class="col-md-4 my-3">
+                <select class="form-select" id="review-category" name="review_type" title="Сортировать">
+                    <option {% if params['review_types'] == 'fresh' %} selected {% endif %} value="fresh">По нивизне</option>
+                    <option {% if params['review_types'] == 'good' %} selected {% endif %} value="good">Cначала положительные</option>
+                    <option {% if params['review_types'] == 'bad' %} selected {% endif %} value="bad">Cначала отрицательные</option>
+                </select>
+            </div>
+
+            <div class="col-md-2 my-3 align-self-end">
+                <button type="submit" class="btn btn-dark w-100 mt-auto">Применить</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="review-list container-fluid mt-3 mb-3">
+        {% for review in reviews %}
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="card-title">Оценка: {{ review.raiting }} | {{ review.user.first_name }} {{
+                    review.user.last_name }} | {{ review.created_at }} </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ review.text }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="mb-5">
+        {{ render_pagination(pagination, request.endpoint, params) }}
+    </div>
+</div>
+{% endblock %}

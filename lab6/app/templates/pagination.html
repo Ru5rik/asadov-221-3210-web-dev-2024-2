@@ -1,6 +1,7 @@
 {% macro render_pagination(pagination, endpoint, params={}) %}
     {% set per_page = pagination.per_page %}
     <nav>
+        {{ params }}
         <ul class="pagination justify-content-center">
             <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
                 <a class="page-link" href="{{ url_for(endpoint, page=(pagination.page - 1), per_page=per_page, **params) if pagination.has_prev else '#' }}" aria-label="Previous">

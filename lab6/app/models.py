@@ -106,3 +106,16 @@ class Image(db.Model):
     @property
     def url(self):
         return url_for('image', image_id=self.id)
+
+class Review(Base):
+    __tablename__ = 'reviews'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    raiting : Mapped[int] = mapped_column(default=0)
+    text : Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(default=datetime.now)
+    course_id : Mapped[int] = mapped_column(ForeignKey("courses.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    
+    course: Mapped["Course"] = relationship()
+    user: Mapped["User"] = relationship()

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from flask_login import login_required
+from flask_login import login_required, current_user
 from sqlalchemy.exc import IntegrityError
-from models import db, Course, Category, User
+from models import db, Course, Category, User, Review
 from tools import CoursesFilter, ImageSaver
 
 bp = Blueprint('courses', __name__, url_prefix='/courses')
@@ -10,14 +10,24 @@ COURSE_PARAMS = [
     'author_id', 'name', 'category_id', 'short_desc', 'full_desc'
 ]
 
+
 def params():
-    return { p: request.form.get(p) or None for p in COURSE_PARAMS }
+    return {p: request.form.get(p) or None for p in COURSE_PARAMS}
+    
+
+def review_params():
+    return {
+        'text': request.form.get('text'),
+        'raiting': request.form.get('raiting'),
+    }
+
 
 def search_params():
     return {
         'name': request.args.get('name'),
         'category_ids': [x for x in request.args.getlist('category_ids') if x],
     }
+
 
 @bp.route('/')
 def index():
@@ -31,6 +41,7 @@ def index():
                            pagination=pagination,
                            search_params=search_params())
 
+
 @bp.route('/new')
 @login_required
 def new():
@@ -41,6 +52,7 @@ def new():
                            categories=categories,
                            users=users,
                            course=course)
+
 
 @bp.route('/create', methods=['POST'])
 @login_required
@@ -57,7 +69,8 @@ def create():
         db.session.add(course)
         db.session.commit()
     except IntegrityError as err:
-        flash(f'Возникла ошибка при записи данных в БД. Проверьте корректность введённых данных. ({err})', 'danger')
+        flash(
+            f'Возникла ошибка при записи данных в БД. Проверьте корректность введённых данных. ({err})', 'danger')
         db.session.rollback()
         categories = db.session.execute(db.select(Category)).scalars()
         users = db.session.execute(db.select(User)).scalars()
@@ -70,7 +83,30 @@ def create():
 
     return redirect(url_for('courses.index'))
 
-@bp.route('/<int:course_id>')
+
+@bp.route('/<int:course_id>/')
 def show(course_id):
     course = db.get_or_404(Course, course_id)
-    return render_template('courses/show.html', course=course)
+    query = db.select(Review).where(Review.course_id == course_id).order_by(Review.created_at.desc()).limit(5)
+    reviews = db.session.scalars(query)
+    reviews = {} if reviews is None else reviews
+    return render_template('courses/show.html', course=course, reviews=reviews)
+
+@bp.route('/<int:course_id>/comment', methods=['POST'])
+@login_required
+def comment(course_id):
+    try:
+        review = Review(**review_params())
+        if review.text is None or len(review.text) == 0:
+            flash(f'Заполните форму!', 'warning')
+            return redirect(url_for('courses.show', course_id=course_id))
+        review.course_id = course_id
+        review.user_id = current_user.id
+        db.session.add(review)
+        db.session.commit()
+    except IntegrityError as err:
+        flash(f'Возникла ошибка при записи данных в БД. Проверьте корректность введённых данных. ({err})', 'danger')
+        db.session.rollback()
+    flash(f'Отзыв был успешно добавлен!', 'success')
+    return redirect(url_for('courses.show', course_id=course_id))
+        

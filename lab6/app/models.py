@@ -119,3 +119,9 @@ class Review(Base):
     
     course: Mapped["Course"] = relationship()
     user: Mapped["User"] = relationship()
+
+    @property
+    def raiting_name(self):
+        return RAITINGS_NAME[self.raiting]
+
+RAITINGS_NAME = ['Ужасно', 'Плохо', 'Неудовлетворительно', 'Удовлетворительно', 'Хорошо', 'Отлично']

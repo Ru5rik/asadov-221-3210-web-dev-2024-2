@@ -15,6 +15,10 @@ migrate = Migrate(app, db)
 
 init_login_manager(app)
 
+@app.errorhandler(Exception)
+def handle_error(e):
+    return render_template("error.html", error=e)
+
 @app.errorhandler(SQLAlchemyError)
 def handle_sqlalchemy_error(err):
     error_msg = ('Возникла ошибка при подключении к базе данных. '

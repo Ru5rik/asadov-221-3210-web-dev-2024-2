@@ -58,14 +58,8 @@ class ReviewFilter:
         self.query = db.select(Review).where(Review.course_id == course_id)
 
     def perform(self):
-        self.__filter_by_review_types()
+        if self.review_types == 'good':
+            return self.query.order_by(Review.raiting.desc(), Review.created_at.desc())
+        if self.review_types == 'bad':
+            return self.query.order_by(Review.raiting.asc(), Review.created_at.desc())
         return self.query.order_by(Review.created_at.desc())
-
-
-    def __filter_by_review_types(self):
-        print('111111111111111111', self.review_types)
-        # t = self.review_types[0]
-        # if t is 'good':
-        #     self.query = self.query.order_by(Review.raiting.desc())
-        # if t is 'bad':
-        #     self.query = self.query.order_by(Review.raiting.asc())

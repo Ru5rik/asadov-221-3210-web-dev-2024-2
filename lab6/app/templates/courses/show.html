@@ -98,8 +98,8 @@
         {% for review in reviews %}
         <div class="card mb-3">
             <div class="card-header">
-                <h5 class="card-title">Оценка: {{ review.raiting }} | {{ review.user.first_name }} {{
-                    review.user.last_name }} | {{ review.created_at }} </h5>
+                <h5 class="card-title">Оценка: {{ review.raiting_name }} | {{ review.user.first_name }} {{
+                    review.user.last_name }} | {{ review.created_at.strftime('%H:%M %d.%m.%Y') }} </h5>
             </div>
             <div class="card-body">
                 <p class="card-text">{{ review.text }}</p>
